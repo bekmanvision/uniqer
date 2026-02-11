@@ -243,11 +243,11 @@ function UniversityModal({
         topMajors: formData.topMajors.split(',').map(m => m.trim()).filter(Boolean),
         allMajors: formData.allMajors.split(',').map(m => m.trim()).filter(Boolean),
         features: formData.features.split(',').map(f => f.trim()).filter(Boolean),
-        tuitionMin: formData.tuitionMin ? parseInt(formData.tuitionMin) : null,
-        tuitionMax: formData.tuitionMax ? parseInt(formData.tuitionMax) : null,
-        founded: formData.founded ? parseInt(formData.founded) : null,
-        studentCount: formData.studentCount ? parseInt(formData.studentCount) : null,
-        internationalStudents: formData.internationalStudents ? parseInt(formData.internationalStudents) : null,
+        tuitionMin: formData.tuitionMin ? parseInt(String(formData.tuitionMin)) : null,
+        tuitionMax: formData.tuitionMax ? parseInt(String(formData.tuitionMax)) : null,
+        founded: formData.founded ? parseInt(String(formData.founded)) : null,
+        studentCount: formData.studentCount ? parseInt(String(formData.studentCount)) : null,
+        internationalStudents: formData.internationalStudents ? parseInt(String(formData.internationalStudents)) : null,
       }
 
       const url = university
