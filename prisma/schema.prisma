@@ -1,0 +1,322 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Туры
+model Tour {
+  id          String   @id @default(cuid())
+  title       String
+  slug        String   @unique
+  city        String
+  startDate   DateTime @map("start_date")
+  endDate     DateTime @map("end_date")
+  price       Int
+  seats       Int
+  seatsLeft   Int      @map("seats_left")
+  grade       String   // "9-11", "10-11" etc
+  status      TourStatus @default(OPEN)
+  description String   @db.Text
+  program     Json     // Program by days
+  includes    String[] // What's included
+  images      String[]
+  featured    Boolean  @default(false)
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  universities TourUniversity[]
+  applications Application[]
+  routes       Route[]
+
+  @@map("tours")
+}
+
+enum TourStatus {
+  OPEN
+  CLOSED
+  CANCELLED
+}
+
+// Университеты
+model University {
+  id          String   @id @default(cuid())
+  name        String
+  slug        String   @unique
+  city        String
+  type        UniversityType
+  description String   @db.Text
+  majors      String[] // Специальности
+  grants      Boolean  @default(false)
+  paid        Boolean  @default(true)
+  logo        String?
+  images      String[]
+  website     String?
+
+  // Новые поля
+  address     String?  // Адрес
+  phone       String?  // Телефон
+  email       String?  // Email
+  hasMilitary Boolean  @default(false) @map("has_military") // Военная кафедра
+  hasDormitory Boolean @default(false) @map("has_dormitory") // Общежитие
+  tuitionMin  Int?     @map("tuition_min") // Мин. стоимость обучения (тенге/год)
+  tuitionMax  Int?     @map("tuition_max") // Макс. стоимость обучения (тенге/год)
+  tuitionNote String?  @map("tuition_note") // Примечание к стоимости
+  founded     Int?     // Год основания
+  ranking     String?  // Рейтинги
+  features    String[] // Особенности (партнёры, аккредитации и т.д.)
+  categories  String[] // Направления: IT, medical, humanities, business, engineering, law
+  targetAudience String? @map("target_audience") @db.Text // Кому подходит этот вуз
+
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  tours TourUniversity[]
+
+  @@map("universities")
+}
+
+enum UniversityType {
+  STATE      // Государственный
+  PRIVATE    // Частный
+  AUTONOMOUS // Автономный (Назарбаев Университет)
+  BRANCH     // Филиал зарубежного вуза
+}
+
+// Связь туров и университетов (many-to-many)
+model TourUniversity {
+  id           String     @id @default(cuid())
+  tourId       String     @map("tour_id")
+  universityId String     @map("university_id")
+  order        Int        @default(0)
+
+  tour         Tour       @relation(fields: [tourId], references: [id], onDelete: Cascade)
+  university   University @relation(fields: [universityId], references: [id], onDelete: Cascade)
+
+  @@unique([tourId, universityId])
+  @@map("tour_universities")
+}
+
+// Маршруты тура
+model Route {
+  id        String   @id @default(cuid())
+  tourId    String   @map("tour_id")
+  day       Int
+  title     String
+  points    Json     // Array of route points with timing
+  createdAt DateTime @default(now()) @map("created_at")
+
+  tour      Tour     @relation(fields: [tourId], references: [id], onDelete: Cascade)
+
+  @@map("routes")
+}
+
+// Заявки
+model Application {
+  id        String            @id @default(cuid())
+  name      String
+  phone     String
+  email     String?
+  city      String?           // Город
+  grade     String?           // Класс (8-12)
+  role      ApplicantRole
+  otherRole String?           @map("other_role") // Если выбрано "Другое"
+  tourId    String?           @map("tour_id")
+  type      ApplicationType   @default(TOUR)
+  message   String?           @db.Text
+  status    ApplicationStatus @default(NEW)
+  source    String?           // Where did they come from
+  createdAt DateTime          @default(now()) @map("created_at")
+  updatedAt DateTime          @updatedAt @map("updated_at")
+
+  tour      Tour?             @relation(fields: [tourId], references: [id], onDelete: SetNull)
+
+  @@map("applications")
+}
+
+enum ApplicantRole {
+  STUDENT
+  PARENT
+  SCHOOL
+  CAREER_COUNSELOR
+  OTHER
+}
+
+enum ApplicationType {
+  TOUR
+  B2B
+  CONTACT
+}
+
+enum ApplicationStatus {
+  NEW
+  CONTACTED
+  CONFIRMED
+  CANCELLED
+  COMPLETED
+}
+
+// Отзывы
+model Review {
+  id        String   @id @default(cuid())
+  name      String
+  role      String   // "Родитель", "Ученик 10-11 класса"
+  roleType  String?  @map("role_type") // PARENT, STUDENT, SCHOOL
+  content   String   @db.Text
+  result    String?  // Микро-результат: "Определился с вузом", "Выбрал специальность"
+  rating    Int      @default(5)
+  avatar    String?
+  featured  Boolean  @default(false)
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("reviews")
+}
+
+// Партнёры
+model Partner {
+  id        String   @id @default(cuid())
+  name      String
+  logo      String
+  website   String?
+  order     Int      @default(0)
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("partners")
+}
+
+// Программы (профориентация, семинары и т.д.)
+model Program {
+  id          String   @id @default(cuid())
+  title       String
+  slug        String   @unique
+  type        ProgramType
+  description String   @db.Text
+  content     String   @db.Text
+  image       String?
+  order       Int      @default(0)
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  @@map("programs")
+}
+
+enum ProgramType {
+  ORIENTATION
+  SEMINAR
+  MEETING
+  TESTING
+  INDIVIDUAL
+}
+
+// Админы
+model Admin {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String
+  name      String
+  role      AdminRole @default(MANAGER)
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("admins")
+}
+
+enum AdminRole {
+  SUPER_ADMIN
+  MANAGER
+}
+
+// Настройки сайта
+model Setting {
+  id    String @id @default(cuid())
+  key   String @unique
+  value String @db.Text
+
+  @@map("settings")
+}
+
+// Зарегистрированные ученики
+model Student {
+  id              String   @id @default(cuid())
+
+  // Данные ученика
+  fullName        String   @map("full_name")           // ФИО ученика
+  phone           String                               // Номер телефона ученика
+  city            String                               // Город
+  school          String                               // Школа
+  grade           String                               // Класс (8-12)
+  age             Int                                  // Возраст
+  language        String                               // Язык обучения (казахский/русский)
+  direction       String                               // Направление (IT, гуманитарные и т.д.)
+  preferredUnis   String?  @map("preferred_unis")      // Предпочитаемые вузы (опционально)
+
+  // Данные родителей
+  parentName      String   @map("parent_name")         // ФИО родителя
+  parentPhone     String   @map("parent_phone")        // Номер телефона родителя
+  parentPhoneBackup String? @map("parent_phone_backup") // Запасной номер родителя
+  contactParent   String   @map("contact_parent")      // Кого указать для связи (мама/папа)
+
+  // Дополнительная информация
+  allergies       String?                              // Аллергия (если есть)
+  travelExperience Boolean @default(false) @map("travel_experience") // Опыт поездок без родителей
+
+  // Привязка к туру
+  tourId          String?  @map("tour_id")
+
+  // Статус
+  status          StudentStatus @default(REGISTERED)
+  notes           String?  @db.Text                    // Заметки администратора
+
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  @@map("students")
+}
+
+enum StudentStatus {
+  REGISTERED    // Зарегистрирован
+  CONFIRMED     // Подтверждён
+  PAID          // Оплачен
+  COMPLETED     // Прошёл тур
+  CANCELLED     // Отменён
+}
+
+// Зарубежные университеты
+model InternationalUniversity {
+  id                  String   @id @default(cuid())
+  name                String                               // Название вуза
+  country             String                               // Страна
+  city                String                               // Город
+  worldRanking        String?  @map("world_ranking")      // Мировой рейтинг (QS, Times, и т.д.)
+  logo                String?                              // Логотип
+  images              String[]                             // Фотографии кампуса
+
+  // Специальности
+  topMajors           String[] @map("top_majors")          // Топовые специальности
+  allMajors           String[] @map("all_majors")          // Все доступные специальности
+
+  // Инфраструктура
+  hasDormitory        Boolean  @default(false) @map("has_dormitory")  // Наличие общежития
+
+  // Стоимость обучения (в долларах США за год)
+  tuitionMin          Int?     @map("tuition_min")         // Минимальная стоимость обучения
+  tuitionMax          Int?     @map("tuition_max")         // Максимальная стоимость обучения
+  tuitionNote         String?  @map("tuition_note")        // Примечание к стоимости
+
+  // Дополнительная информация
+  description         String?  @db.Text                    // Описание университета
+  website             String?                              // Официальный сайт
+  founded             Int?                                 // Год основания
+  studentCount        Int?     @map("student_count")       // Количество студентов
+  internationalStudents Int?   @map("international_students") // Количество иностранных студентов
+  language            String?                              // Язык обучения
+  features            String[]                             // Особенности вуза
+
+  createdAt           DateTime @default(now()) @map("created_at")
+  updatedAt           DateTime @updatedAt @map("updated_at")
+
+  @@map("international_universities")
+}
