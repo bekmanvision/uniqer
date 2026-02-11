@@ -139,8 +139,8 @@ export default function ForSchoolsPage() {
                 </div>
                 <div>
                   <p className="text-sm text-gray-500">Телефон для школ</p>
-                  <a href="tel:+77001234567" className="font-medium text-gray-900">
-                    +7 (700) 123-45-67
+                  <a href="https://wa.me/77762121242" className="font-medium text-gray-900">
+                    +7 776 212 1242
                   </a>
                 </div>
               </div>

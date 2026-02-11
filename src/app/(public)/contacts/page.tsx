@@ -11,10 +11,10 @@ export const metadata: Metadata = {
 const contacts = [
   {
     icon: Phone,
-    title: 'Телефон',
-    value: '+7 (700) 123-45-67',
-    href: 'tel:+77001234567',
-    description: 'Звоните с 9:00 до 18:00',
+    title: 'WhatsApp',
+    value: '+7 776 212 1242',
+    href: 'https://wa.me/77762121242',
+    description: 'Пишите в WhatsApp',
   },
   {
     icon: Mail,
@@ -42,18 +42,13 @@ const contacts = [
 const socials = [
   {
     name: 'WhatsApp',
-    href: 'https://wa.me/77001234567',
+    href: 'https://wa.me/77762121242',
     color: 'bg-green-500',
   },
   {
     name: 'Instagram',
-    href: 'https://instagram.com/uniqer',
+    href: 'https://instagram.com/uniqer.kz',
     color: 'bg-pink-500',
-  },
-  {
-    name: 'Telegram',
-    href: 'https://t.me/uniqer',
-    color: 'bg-blue-500',
   },
 ]
 
@@ -121,25 +116,25 @@ export default function ContactsPage() {
             </p>
 
             <div className="mt-8">
-              <h3 className="font-semibold text-gray-900">Часто задаваемые вопросы</h3>
-              <div className="mt-4 space-y-4">
-                <div>
+              <h3 className="text-lg font-semibold text-gray-900">Часто задаваемые вопросы</h3>
+              <div className="mt-4 space-y-3">
+                <div className="rounded-lg border border-gray-200 bg-white p-4">
                   <h4 className="font-medium text-gray-900">Как записаться на тур?</h4>
-                  <p className="mt-1 text-sm text-gray-600">
+                  <p className="mt-2 text-sm text-gray-600">
                     Выберите подходящий тур в каталоге и заполните форму заявки. Мы свяжемся с
                     вами для подтверждения.
                   </p>
                 </div>
-                <div>
+                <div className="rounded-lg border border-gray-200 bg-white p-4">
                   <h4 className="font-medium text-gray-900">Что входит в стоимость?</h4>
-                  <p className="mt-1 text-sm text-gray-600">
+                  <p className="mt-2 text-sm text-gray-600">
                     Транспорт, проживание, питание, экскурсии и все программные мероприятия.
                     Детали указаны на странице каждого тура.
                   </p>
                 </div>
-                <div>
+                <div className="rounded-lg border border-gray-200 bg-white p-4">
                   <h4 className="font-medium text-gray-900">Есть ли скидки для групп?</h4>
-                  <p className="mt-1 text-sm text-gray-600">
+                  <p className="mt-2 text-sm text-gray-600">
                     Да, мы предлагаем специальные условия для школьных групп. Свяжитесь с нами
                     для получения индивидуального предложения.
                   </p>

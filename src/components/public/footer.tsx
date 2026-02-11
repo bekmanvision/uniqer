@@ -37,11 +37,11 @@ export function Footer() {
             </p>
             <div className="mt-6 space-y-2">
               <a
-                href="tel:+77001234567"
+                href="https://wa.me/77762121242"
                 className="flex items-center gap-2 text-sm text-gray-600 hover:text-blue-600"
               >
                 <Phone className="h-4 w-4" />
-                +7 (700) 123-45-67
+                +7 776 212 1242
               </a>
               <a
                 href="mailto:info@uniqer.kz"
@@ -109,7 +109,7 @@ export function Footer() {
             {/* Social Links */}
             <div className="mt-6 flex gap-4">
               <a
-                href="https://instagram.com/uniqer"
+                href="https://instagram.com/uniqer.kz"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-gray-400 hover:text-blue-600"
@@ -119,7 +119,7 @@ export function Footer() {
                 </svg>
               </a>
               <a
-                href="https://wa.me/77001234567"
+                href="https://wa.me/77762121242"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-gray-400 hover:text-green-600"
