@@ -11,14 +11,16 @@ export const metadata: Metadata = {
 }
 
 interface PageProps {
-  searchParams: Promise<{ country?: string; city?: string }>
+  searchParams: Promise<{ country?: string; city?: string; language?: string; dormitory?: string }>
 }
 
-async function getUniversities(filters: { country?: string; city?: string }) {
+async function getUniversities(filters: { country?: string; city?: string; language?: string; dormitory?: string }) {
   const where: Record<string, unknown> = {}
 
   if (filters.country) where.country = filters.country
   if (filters.city) where.city = filters.city
+  if (filters.language) where.language = filters.language
+  if (filters.dormitory === 'true') where.hasDormitory = true
 
   return prisma.internationalUniversity.findMany({
     where,
@@ -48,12 +50,22 @@ async function getCities(country?: string) {
   return universities.map((u) => u.city)
 }
 
+async function getLanguages() {
+  const universities = await prisma.internationalUniversity.findMany({
+    select: { language: true },
+    distinct: ['language'],
+    orderBy: { language: 'asc' },
+  })
+  return universities.map((u) => u.language).filter(Boolean) as string[]
+}
+
 export default async function InternationalUniversitiesPage({ searchParams }: PageProps) {
   const params = await searchParams
-  const [universities, countries, cities] = await Promise.all([
+  const [universities, countries, cities, languages] = await Promise.all([
     getUniversities(params),
     getCountries(),
     getCities(params.country),
+    getLanguages(),
   ])
 
   return (
@@ -71,7 +83,9 @@ export default async function InternationalUniversitiesPage({ searchParams }: Pa
         <InternationalUniversityFilters
           countries={countries}
           cities={cities}
+          languages={languages}
           currentFilters={params}
+          totalCount={universities.length}
         />
 
         {/* Universities Grid */}
