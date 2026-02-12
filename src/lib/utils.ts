@@ -54,8 +54,8 @@ export function slugify(text: string): string {
 
 export function getStatusLabel(status: string): string {
   const labels: Record<string, string> = {
-    OPEN: 'Набор открыт',
-    CLOSED: 'Набор закрыт',
+    OPEN: 'Доступен',
+    CLOSED: 'Недоступен',
     CANCELLED: 'Отменён',
     NEW: 'Новая',
     CONTACTED: 'Связались',

@@ -2,7 +2,7 @@
 
 import { useState, useEffect, use } from 'react'
 import { useRouter } from 'next/navigation'
-import { Button, Input, Select, Textarea, Card, CardContent, CardHeader, CardTitle } from '@/components/ui'
+import { Button, Input, Textarea, Card, CardContent, CardHeader, CardTitle } from '@/components/ui'
 import { ArrowLeft, Plus, X } from 'lucide-react'
 import Link from 'next/link'
 import type { University, TourFull } from '@/types'
@@ -22,7 +22,7 @@ export default function EditTourPage({ params }: { params: Promise<{ id: string 
     price: '',
     seats: '',
     seatsLeft: '',
-    grade: '9-11',
+    grades: [] as string[],
     status: 'OPEN',
     description: '',
     includes: [''],
@@ -47,7 +47,7 @@ export default function EditTourPage({ params }: { params: Promise<{ id: string 
           price: String(tour.price),
           seats: String(tour.seats),
           seatsLeft: String(tour.seatsLeft),
-          grade: tour.grade,
+          grades: tour.grade ? tour.grade.split(',') : [],
           status: tour.status,
           description: tour.description,
           includes: tour.includes.length ? tour.includes : [''],
@@ -76,6 +76,8 @@ export default function EditTourPage({ params }: { params: Promise<{ id: string 
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           ...formData,
+          grades: undefined,
+          grade: formData.grades.join(','),
           price: parseInt(formData.price),
           seats: parseInt(formData.seats),
           seatsLeft: parseInt(formData.seatsLeft),
@@ -176,23 +178,33 @@ export default function EditTourPage({ params }: { params: Promise<{ id: string 
               onChange={(e) => setFormData({ ...formData, title: e.target.value })}
               required
             />
-            <div className="grid gap-4 sm:grid-cols-2">
-              <Input
-                label="Город *"
-                value={formData.city}
-                onChange={(e) => setFormData({ ...formData, city: e.target.value })}
-                required
-              />
-              <Select
-                label="Для классов *"
-                value={formData.grade}
-                onChange={(e) => setFormData({ ...formData, grade: e.target.value })}
-                options={[
-                  { value: '9-11', label: '9-11 класс' },
-                  { value: '10-11', label: '10-11 класс' },
-                  { value: '11', label: '11 класс' },
-                ]}
-              />
+            <Input
+              label="Город *"
+              value={formData.city}
+              onChange={(e) => setFormData({ ...formData, city: e.target.value })}
+              required
+            />
+            <div>
+              <label className="mb-2 block text-sm font-medium text-gray-700">Для классов *</label>
+              <div className="flex flex-wrap gap-4">
+                {['8', '9', '10', '11', '12'].map((g) => (
+                  <label key={g} className="flex items-center gap-2">
+                    <input
+                      type="checkbox"
+                      checked={formData.grades.includes(g)}
+                      onChange={(e) => {
+                        if (e.target.checked) {
+                          setFormData({ ...formData, grades: [...formData.grades, g].sort() })
+                        } else {
+                          setFormData({ ...formData, grades: formData.grades.filter(v => v !== g) })
+                        }
+                      }}
+                      className="rounded border-gray-300"
+                    />
+                    <span className="text-sm text-gray-700">{g} класс</span>
+                  </label>
+                ))}
+              </div>
             </div>
             <div className="grid gap-4 sm:grid-cols-2">
               <Input
@@ -210,7 +222,7 @@ export default function EditTourPage({ params }: { params: Promise<{ id: string 
                 required
               />
             </div>
-            <div className="grid gap-4 sm:grid-cols-4">
+            <div className="grid gap-4 sm:grid-cols-3">
               <Input
                 label="Цена (KZT) *"
                 type="number"
@@ -231,16 +243,6 @@ export default function EditTourPage({ params }: { params: Promise<{ id: string 
                 value={formData.seatsLeft}
                 onChange={(e) => setFormData({ ...formData, seatsLeft: e.target.value })}
               />
-              <Select
-                label="Статус"
-                value={formData.status}
-                onChange={(e) => setFormData({ ...formData, status: e.target.value })}
-                options={[
-                  { value: 'OPEN', label: 'Набор открыт' },
-                  { value: 'CLOSED', label: 'Набор закрыт' },
-                  { value: 'CANCELLED', label: 'Отменён' },
-                ]}
-              />
             </div>
             <Textarea
               label="Описание *"
@@ -248,40 +250,68 @@ export default function EditTourPage({ params }: { params: Promise<{ id: string 
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
               required
             />
-            <label className="flex items-center gap-2">
-              <input
-                type="checkbox"
-                checked={formData.featured}
-                onChange={(e) => setFormData({ ...formData, featured: e.target.checked })}
-                className="rounded border-gray-300"
-              />
-              <span className="text-sm text-gray-700">Популярный тур</span>
-            </label>
+            <div className="flex flex-wrap gap-6">
+              <label className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  checked={formData.status === 'OPEN'}
+                  onChange={(e) => setFormData({ ...formData, status: e.target.checked ? 'OPEN' : 'CLOSED' })}
+                  className="rounded border-gray-300"
+                />
+                <span className="text-sm text-gray-700">Доступен</span>
+              </label>
+              <label className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  checked={formData.featured}
+                  onChange={(e) => setFormData({ ...formData, featured: e.target.checked })}
+                  className="rounded border-gray-300"
+                />
+                <span className="text-sm text-gray-700">Популярный тур</span>
+              </label>
+            </div>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader><CardTitle>Университеты</CardTitle></CardHeader>
           <CardContent>
-            <div className="space-y-2">
-              {universities.map((uni) => (
-                <label key={uni.id} className="flex items-center gap-2">
-                  <input
-                    type="checkbox"
-                    checked={formData.universityIds.includes(uni.id)}
-                    onChange={(e) => {
-                      if (e.target.checked) {
-                        setFormData({ ...formData, universityIds: [...formData.universityIds, uni.id] })
-                      } else {
-                        setFormData({ ...formData, universityIds: formData.universityIds.filter(idx => idx !== uni.id) })
-                      }
-                    }}
-                    className="rounded border-gray-300"
-                  />
-                  <span className="text-sm text-gray-700">{uni.name} ({uni.city})</span>
-                </label>
-              ))}
-            </div>
+            {universities.length === 0 ? (
+              <p className="text-sm text-gray-500">Сначала добавьте университеты</p>
+            ) : (
+              <div className="space-y-4">
+                {Object.entries(
+                  universities.reduce((acc, uni) => {
+                    if (!acc[uni.city]) acc[uni.city] = []
+                    acc[uni.city].push(uni)
+                    return acc
+                  }, {} as Record<string, University[]>)
+                ).map(([city, unis]) => (
+                  <div key={city}>
+                    <h4 className="mb-2 text-sm font-semibold text-gray-900">{city}</h4>
+                    <div className="space-y-1 pl-2">
+                      {unis.map((uni) => (
+                        <label key={uni.id} className="flex items-center gap-2">
+                          <input
+                            type="checkbox"
+                            checked={formData.universityIds.includes(uni.id)}
+                            onChange={(e) => {
+                              if (e.target.checked) {
+                                setFormData({ ...formData, universityIds: [...formData.universityIds, uni.id] })
+                              } else {
+                                setFormData({ ...formData, universityIds: formData.universityIds.filter(idx => idx !== uni.id) })
+                              }
+                            }}
+                            className="rounded border-gray-300"
+                          />
+                          <span className="text-sm text-gray-700">{uni.name}</span>
+                        </label>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </CardContent>
         </Card>
 

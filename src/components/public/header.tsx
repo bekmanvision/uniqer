@@ -8,6 +8,7 @@ import { Button } from '@/components/ui'
 const navigation = [
   { name: 'Туры', href: '/tours' },
   { name: 'Университеты', href: '/universities' },
+  { name: 'Зарубежные вузы', href: '/international-universities' },
   { name: 'Для школ', href: '/schools' },
   { name: 'О проекте', href: '/about' },
   { name: 'Контакты', href: '/contacts' },
