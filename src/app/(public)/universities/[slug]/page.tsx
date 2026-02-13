@@ -235,7 +235,8 @@ export default async function UniversityPage({ params }: UniversityPageProps) {
                 <CardContent className="p-6 lg:p-8">
                   <div className="flex items-center gap-2 mb-4">
                     <GraduationCap className="h-5 w-5 text-blue-600" />
-                    <h2 className="text-lg font-semibold text-gray-900">Специальности</h2>
+                    <h2 className="text-lg font-semibold text-gray-900">Специальности бакалавриата</h2>
+                    <span className="text-sm text-gray-400">({university.majors.length})</span>
                   </div>
                   <div className="flex flex-wrap gap-2">
                     {university.majors.map((major) => (
