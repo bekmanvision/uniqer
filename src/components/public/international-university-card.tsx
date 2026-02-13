@@ -1,3 +1,4 @@
+import Link from 'next/link'
 import { Globe, MapPin, Home, Languages, Banknote, Trophy } from 'lucide-react'
 import { Badge } from '@/components/ui'
 import type { InternationalUniversity } from '@prisma/client'
@@ -10,7 +11,7 @@ export function InternationalUniversityCard({ university }: InternationalUnivers
   const hasPrice = university.tuitionMin && university.tuitionMin > 0
 
   return (
-    <div className="group h-full overflow-hidden rounded-2xl border border-gray-100 bg-white transition-all hover:shadow-lg hover:border-blue-100">
+    <Link href={`/international-universities/${university.id}`} className="group h-full overflow-hidden rounded-2xl border border-gray-100 bg-white transition-all hover:shadow-lg hover:border-blue-100 block">
       {/* Header with icon and badges */}
       <div className="p-5 pb-0">
         <div className="flex items-start gap-4">
@@ -108,6 +109,6 @@ export function InternationalUniversityCard({ university }: InternationalUnivers
           </div>
         </div>
       </div>
-    </div>
+    </Link>
   )
 }
