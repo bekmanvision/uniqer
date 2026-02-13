@@ -5,6 +5,7 @@ import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import prisma from '@/lib/prisma'
 import { Badge, Card, CardContent } from '@/components/ui'
+import { SpecialtiesSection } from '@/components/public'
 import {
   MapPin,
   ExternalLink,
@@ -172,64 +173,10 @@ export default async function InternationalUniversityPage({ params }: PageProps)
             </Card>
 
             {/* Specialties */}
-            {(university.topMajors.length > 0 || university.allMajors.length > 0) && (
-              <Card>
-                <CardContent className="p-6 lg:p-8">
-                  <div className="mb-4 flex items-center gap-2">
-                    <GraduationCap className="h-5 w-5 text-blue-600" />
-                    <h2 className="text-lg font-semibold text-gray-900">Специальности бакалавриата</h2>
-                    <span className="text-sm text-gray-400">
-                      ({university.allMajors.length || university.topMajors.length})
-                    </span>
-                  </div>
-
-                  {university.topMajors.length > 0 && university.allMajors.length > 0 && (
-                    <div className="mb-4">
-                      <p className="mb-2 text-xs font-medium uppercase tracking-wide text-gray-400">Топовые направления</p>
-                      <div className="flex flex-wrap gap-2">
-                        {university.topMajors.map((major) => (
-                          <span
-                            key={major}
-                            className="rounded-full bg-yellow-50 px-3 py-1.5 text-sm font-medium text-yellow-800"
-                          >
-                            {major}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-
-                  {university.allMajors.length > 0 ? (
-                    <div>
-                      {university.topMajors.length > 0 && (
-                        <p className="mb-2 text-xs font-medium uppercase tracking-wide text-gray-400">Все специальности</p>
-                      )}
-                      <div className="flex flex-wrap gap-2">
-                        {university.allMajors.map((major) => (
-                          <span
-                            key={major}
-                            className="rounded-full bg-gray-100 px-3 py-1.5 text-sm text-gray-700 transition-colors hover:bg-gray-200"
-                          >
-                            {major}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="flex flex-wrap gap-2">
-                      {university.topMajors.map((major) => (
-                        <span
-                          key={major}
-                          className="rounded-full bg-yellow-50 px-3 py-1.5 text-sm font-medium text-yellow-800"
-                        >
-                          {major}
-                        </span>
-                      ))}
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-            )}
+            <SpecialtiesSection
+              majors={university.allMajors}
+              topMajors={university.topMajors}
+            />
           </div>
 
           {/* Sidebar */}

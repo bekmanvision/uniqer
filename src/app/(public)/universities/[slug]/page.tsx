@@ -6,6 +6,7 @@ import Link from 'next/link'
 import prisma from '@/lib/prisma'
 import { getUniversityTypeLabel, formatDateRange, formatPrice } from '@/lib/utils'
 import { Badge, Card, CardContent } from '@/components/ui'
+import { SpecialtiesSection } from '@/components/public'
 import {
   MapPin,
   ExternalLink,
@@ -230,27 +231,7 @@ export default async function UniversityPage({ params }: UniversityPageProps) {
             </Card>
 
             {/* Majors */}
-            {university.majors.length > 0 && (
-              <Card>
-                <CardContent className="p-6 lg:p-8">
-                  <div className="flex items-center gap-2 mb-4">
-                    <GraduationCap className="h-5 w-5 text-blue-600" />
-                    <h2 className="text-lg font-semibold text-gray-900">Специальности бакалавриата</h2>
-                    <span className="text-sm text-gray-400">({university.majors.length})</span>
-                  </div>
-                  <div className="flex flex-wrap gap-2">
-                    {university.majors.map((major) => (
-                      <span
-                        key={major}
-                        className="rounded-full bg-gray-100 px-3 py-1.5 text-sm text-gray-700 hover:bg-gray-200 transition-colors"
-                      >
-                        {major}
-                      </span>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
-            )}
+            <SpecialtiesSection majors={university.majors} />
 
             {/* Tours */}
             {university.tours.length > 0 && (
