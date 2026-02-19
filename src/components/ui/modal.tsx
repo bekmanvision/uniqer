@@ -34,17 +34,17 @@ export function Modal({ isOpen, onClose, title, children, size = 'md' }: ModalPr
         {/* Modal */}
         <div
           className={cn(
-            'relative z-10 w-full rounded-xl bg-white shadow-xl',
+            'relative z-10 w-full rounded-xl bg-white shadow-xl dark:bg-gray-900',
             sizes[size]
           )}
         >
           {/* Header */}
           {title && (
-            <div className="flex items-center justify-between border-b border-gray-200 px-6 py-4">
-              <h2 className="text-lg font-semibold text-gray-900">{title}</h2>
+            <div className="flex items-center justify-between border-b border-gray-200 dark:border-gray-700 px-6 py-4">
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">{title}</h2>
               <button
                 onClick={onClose}
-                className="rounded-lg p-1 text-gray-400 hover:bg-gray-100 hover:text-gray-600"
+                className="rounded-lg p-1 text-gray-400 hover:bg-gray-100 hover:text-gray-600 dark:hover:bg-gray-800 dark:hover:text-gray-300"
               >
                 <X className="h-5 w-5" />
               </button>

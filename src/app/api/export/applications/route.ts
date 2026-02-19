@@ -1,6 +1,24 @@
 import { NextRequest, NextResponse } from 'next/server'
 import prisma from '@/lib/prisma'
-import { formatDate, getRoleLabel, getStatusLabel } from '@/lib/utils'
+import { formatDate } from '@/lib/utils'
+
+const roleLabels: Record<string, string> = {
+  STUDENT: 'Ученик',
+  PARENT: 'Родитель',
+  SCHOOL: 'Представитель школы',
+  CAREER_COUNSELOR: 'Профориентатор',
+  OTHER: 'Другое',
+}
+
+const statusLabels: Record<string, string> = {
+  OPEN: 'Доступен',
+  CLOSED: 'Недоступен',
+  CANCELLED: 'Отменён',
+  NEW: 'Новая',
+  CONTACTED: 'Связались',
+  CONFIRMED: 'Подтверждена',
+  COMPLETED: 'Завершена',
+}
 import { ApplicationStatus, ApplicantRole, ApplicationType } from '@prisma/client'
 
 // GET /api/export/applications - Export applications to CSV
@@ -60,11 +78,11 @@ export async function GET(request: NextRequest) {
       app.name,
       app.phone,
       app.email || '',
-      getRoleLabel(app.role),
+      roleLabels[app.role] || app.role,
       app.tour?.title || '',
       app.tour?.city || '',
       app.type,
-      getStatusLabel(app.status),
+      statusLabels[app.status] || app.status,
       (app.message || '').replace(/"/g, '""'),
       app.source || '',
       formatDate(app.createdAt),

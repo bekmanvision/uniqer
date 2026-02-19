@@ -1,5 +1,7 @@
 'use client'
 
+import { useTranslations } from 'next-intl'
+
 interface WhatsAppButtonProps {
   phoneNumber?: string
   message?: string
@@ -15,9 +17,12 @@ function WhatsAppIcon({ className }: { className?: string }) {
 
 export function WhatsAppButton({
   phoneNumber = '77762121242',
-  message = 'Здравствуйте! Интересуюсь кампус-турами UniQer.',
+  message,
 }: WhatsAppButtonProps) {
-  const encodedMessage = encodeURIComponent(message)
+  const t = useTranslations('whatsapp')
+
+  const finalMessage = message ?? t('defaultMessage')
+  const encodedMessage = encodeURIComponent(finalMessage)
   const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodedMessage}`
 
   return (
@@ -26,10 +31,10 @@ export function WhatsAppButton({
       target="_blank"
       rel="noopener noreferrer"
       className="fixed bottom-6 right-6 z-50 flex items-center gap-2 rounded-full bg-green-500 px-4 py-3 text-white shadow-lg transition-all hover:bg-green-600 hover:shadow-xl hover:scale-105"
-      aria-label="Написать в WhatsApp"
+      aria-label={t('ariaLabel')}
     >
       <WhatsAppIcon className="h-6 w-6" />
-      <span className="hidden sm:inline font-medium">Написать</span>
+      <span className="hidden sm:inline font-medium">{t('buttonText')}</span>
     </a>
   )
 }

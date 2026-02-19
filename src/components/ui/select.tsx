@@ -9,25 +9,27 @@ interface SelectProps extends SelectHTMLAttributes<HTMLSelectElement> {
   options: { value: string; label: string }[]
 }
 
+const selectBase = [
+  'rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm text-gray-700',
+  'dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200',
+  'transition-colors hover:border-gray-300 dark:hover:border-gray-500',
+  'focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20',
+  'disabled:cursor-not-allowed disabled:bg-gray-50 disabled:text-gray-500 dark:disabled:bg-gray-900 dark:disabled:text-gray-600',
+  "appearance-none bg-[url(\"data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e\")] bg-[length:1em] bg-[right_0.75rem_center] bg-no-repeat pr-10",
+].join(' ')
+
 const Select = forwardRef<HTMLSelectElement, SelectProps>(
   ({ className, label, error, id, options, ...props }, ref) => {
-    return (
-      <div className="w-full">
-        {label && (
-          <label htmlFor={id} className="mb-1 block text-sm font-medium text-gray-700">
-            {label}
-          </label>
-        )}
+    // Inline mode (no label): render <select> directly without wrapper div
+    if (!label) {
+      return (
         <select
           ref={ref}
           id={id}
           className={cn(
-            'w-full rounded-lg border border-gray-300 bg-white px-4 py-2 text-gray-900',
-            'focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500',
-            'disabled:cursor-not-allowed disabled:bg-gray-50 disabled:text-gray-500',
-            'appearance-none bg-[url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'currentColor\' stroke-width=\'2\' stroke-linecap=\'round\' stroke-linejoin=\'round\'%3e%3cpolyline points=\'6 9 12 15 18 9\'%3e%3c/polyline%3e%3c/svg%3e")] bg-[length:1em] bg-[right_0.75rem_center] bg-no-repeat pr-10',
-            error && 'border-red-500 focus:border-red-500 focus:ring-red-500',
-            className
+            selectBase,
+            error && 'border-red-500 focus:border-red-500 focus:ring-red-500/20',
+            className,
           )}
           style={{ WebkitAppearance: 'none', MozAppearance: 'none' }}
           {...props}
@@ -38,7 +40,34 @@ const Select = forwardRef<HTMLSelectElement, SelectProps>(
             </option>
           ))}
         </select>
-        {error && <p className="mt-1 text-sm text-red-600">{error}</p>}
+      )
+    }
+
+    // Form mode (with label): use wrapper div
+    return (
+      <div className="w-full">
+        <label htmlFor={id} className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
+          {label}
+        </label>
+        <select
+          ref={ref}
+          id={id}
+          className={cn(
+            'w-full',
+            selectBase,
+            error && 'border-red-500 focus:border-red-500 focus:ring-red-500/20',
+            className,
+          )}
+          style={{ WebkitAppearance: 'none', MozAppearance: 'none' }}
+          {...props}
+        >
+          {options.map((option) => (
+            <option key={option.value} value={option.value}>
+              {option.label}
+            </option>
+          ))}
+        </select>
+        {error && <p className="mt-1 text-sm text-red-600 dark:text-red-400">{error}</p>}
       </div>
     )
   }

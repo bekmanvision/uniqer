@@ -1,7 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server'
 import prisma from '@/lib/prisma'
 import { sendEmail, applicationConfirmationEmail, newApplicationNotification } from '@/lib/email'
-import { getRoleLabel } from '@/lib/utils'
+
+const roleLabels: Record<string, string> = {
+  STUDENT: 'Ученик',
+  PARENT: 'Родитель',
+  SCHOOL: 'Представитель школы',
+  CAREER_COUNSELOR: 'Профориентатор',
+  OTHER: 'Другое',
+}
 import { ApplicationStatus, ApplicantRole, ApplicationType } from '@prisma/client'
 
 // GET /api/applications - Get all applications
@@ -151,7 +158,7 @@ export async function POST(request: NextRequest) {
         html: newApplicationNotification(
           name,
           phone,
-          getRoleLabel(role),
+          roleLabels[role] || role,
           tour?.title || 'Форма контакта'
         ),
       })

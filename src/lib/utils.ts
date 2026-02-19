@@ -5,8 +5,14 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
-export function formatPrice(price: number): string {
-  return new Intl.NumberFormat('ru-KZ', {
+const localeMap: Record<string, string> = {
+  ru: 'ru-KZ',
+  kk: 'kk-KZ',
+  en: 'en-US',
+}
+
+export function formatPrice(price: number, locale: string = 'ru'): string {
+  return new Intl.NumberFormat(localeMap[locale] || 'ru-KZ', {
     style: 'currency',
     currency: 'KZT',
     minimumFractionDigits: 0,
@@ -14,29 +20,30 @@ export function formatPrice(price: number): string {
   }).format(price)
 }
 
-export function formatDate(date: Date | string): string {
+export function formatDate(date: Date | string, locale: string = 'ru'): string {
   const d = new Date(date)
-  return new Intl.DateTimeFormat('ru-RU', {
+  return new Intl.DateTimeFormat(localeMap[locale] || 'ru-RU', {
     day: 'numeric',
     month: 'long',
     year: 'numeric',
   }).format(d)
 }
 
-export function formatDateRange(start: Date | string, end: Date | string): string {
+export function formatDateRange(start: Date | string, end: Date | string, locale: string = 'ru'): string {
   const startDate = new Date(start)
   const endDate = new Date(end)
+  const intlLocale = localeMap[locale] || 'ru-RU'
 
   const startDay = startDate.getDate()
   const endDay = endDate.getDate()
-  const month = new Intl.DateTimeFormat('ru-RU', { month: 'long' }).format(endDate)
+  const month = new Intl.DateTimeFormat(intlLocale, { month: 'long' }).format(endDate)
   const year = endDate.getFullYear()
 
   if (startDate.getMonth() === endDate.getMonth()) {
     return `${startDay}-${endDay} ${month} ${year}`
   }
 
-  const startMonth = new Intl.DateTimeFormat('ru-RU', { month: 'long' }).format(startDate)
+  const startMonth = new Intl.DateTimeFormat(intlLocale, { month: 'long' }).format(startDate)
   return `${startDay} ${startMonth} - ${endDay} ${month} ${year}`
 }
 
@@ -52,19 +59,6 @@ export function slugify(text: string): string {
     .replace(/-+$/, '')
 }
 
-export function getStatusLabel(status: string): string {
-  const labels: Record<string, string> = {
-    OPEN: 'Доступен',
-    CLOSED: 'Недоступен',
-    CANCELLED: 'Отменён',
-    NEW: 'Новая',
-    CONTACTED: 'Связались',
-    CONFIRMED: 'Подтверждена',
-    COMPLETED: 'Завершена',
-  }
-  return labels[status] || status
-}
-
 export function getStatusColor(status: string): string {
   const colors: Record<string, string> = {
     OPEN: 'bg-green-100 text-green-800',
@@ -76,24 +70,4 @@ export function getStatusColor(status: string): string {
     COMPLETED: 'bg-gray-100 text-gray-800',
   }
   return colors[status] || 'bg-gray-100 text-gray-800'
-}
-
-export function getRoleLabel(role: string): string {
-  const labels: Record<string, string> = {
-    STUDENT: 'Ученик',
-    PARENT: 'Родитель',
-    SCHOOL: 'Школа',
-    OTHER: 'Другое',
-  }
-  return labels[role] || role
-}
-
-export function getUniversityTypeLabel(type: string): string {
-  const labels: Record<string, string> = {
-    STATE: 'Государственный',
-    PRIVATE: 'Частный',
-    AUTONOMOUS: 'Автономный',
-    BRANCH: 'Филиал',
-  }
-  return labels[type] || type
 }

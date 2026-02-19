@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useTranslations } from 'next-intl'
 import { Button, Input, Select, Textarea } from '@/components/ui'
 
 interface ApplicationFormProps {
@@ -11,56 +12,50 @@ interface ApplicationFormProps {
   onSuccess?: () => void
 }
 
-const roleOptions = [
-  { value: '', label: 'Выберите' },
-  { value: 'PARENT', label: 'Родитель' },
-  { value: 'STUDENT', label: 'Ученик' },
-  { value: 'SCHOOL', label: 'Представитель школы' },
-  { value: 'CAREER_COUNSELOR', label: 'Профориентатор' },
-  { value: 'OTHER', label: 'Другое' },
-]
+const cityKeys = [
+  '', 'astana', 'almaty', 'shymkent',
+  'aktau', 'aktobe', 'atyrau', 'balkhash',
+  'zhanaozen', 'zhezkazgan', 'karaganda', 'kentau',
+  'kokshetau', 'kostanay', 'kyzylorda', 'pavlodar',
+  'petropavlovsk', 'rudny', 'satpayev', 'semey',
+  'taldykorgan', 'taraz', 'temirtau', 'turkestan',
+  'uralsk', 'ustKamenogorsk', 'ekibastuz', 'other',
+] as const
 
-// Астана, Алматы, Шымкент первыми, остальные в алфавитном порядке
-const kazakhstanCities = [
-  { value: '', label: 'Выберите город' },
-  { value: 'astana', label: 'Астана' },
-  { value: 'almaty', label: 'Алматы' },
-  { value: 'shymkent', label: 'Шымкент' },
-  // Остальные города по алфавиту
-  { value: 'aktau', label: 'Актау' },
-  { value: 'aktobe', label: 'Актобе' },
-  { value: 'atyrau', label: 'Атырау' },
-  { value: 'balkhash', label: 'Балхаш' },
-  { value: 'zhanaozen', label: 'Жанаозен' },
-  { value: 'zhezkazgan', label: 'Жезказган' },
-  { value: 'karaganda', label: 'Караганда' },
-  { value: 'kentau', label: 'Кентау' },
-  { value: 'kokshetau', label: 'Кокшетау' },
-  { value: 'kostanay', label: 'Костанай' },
-  { value: 'kyzylorda', label: 'Кызылорда' },
-  { value: 'pavlodar', label: 'Павлодар' },
-  { value: 'petropavlovsk', label: 'Петропавловск' },
-  { value: 'rudny', label: 'Рудный' },
-  { value: 'satpayev', label: 'Сатпаев' },
-  { value: 'semey', label: 'Семей' },
-  { value: 'taldykorgan', label: 'Талдыкорган' },
-  { value: 'taraz', label: 'Тараз' },
-  { value: 'temirtau', label: 'Темиртау' },
-  { value: 'turkestan', label: 'Туркестан' },
-  { value: 'uralsk', label: 'Уральск' },
-  { value: 'ust-kamenogorsk', label: 'Усть-Каменогорск' },
-  { value: 'ekibastuz', label: 'Экибастуз' },
-  { value: 'other', label: 'Другой город' },
-]
+const cityValues: Record<string, string> = {
+  '': '',
+  'astana': 'astana',
+  'almaty': 'almaty',
+  'shymkent': 'shymkent',
+  'aktau': 'aktau',
+  'aktobe': 'aktobe',
+  'atyrau': 'atyrau',
+  'balkhash': 'balkhash',
+  'zhanaozen': 'zhanaozen',
+  'zhezkazgan': 'zhezkazgan',
+  'karaganda': 'karaganda',
+  'kentau': 'kentau',
+  'kokshetau': 'kokshetau',
+  'kostanay': 'kostanay',
+  'kyzylorda': 'kyzylorda',
+  'pavlodar': 'pavlodar',
+  'petropavlovsk': 'petropavlovsk',
+  'rudny': 'rudny',
+  'satpayev': 'satpayev',
+  'semey': 'semey',
+  'taldykorgan': 'taldykorgan',
+  'taraz': 'taraz',
+  'temirtau': 'temirtau',
+  'turkestan': 'turkestan',
+  'uralsk': 'uralsk',
+  'ustKamenogorsk': 'ust-kamenogorsk',
+  'ekibastuz': 'ekibastuz',
+  'other': 'other',
+}
 
-const gradeOptions = [
-  { value: '', label: 'Выберите класс' },
-  { value: '8', label: '8 класс' },
-  { value: '9', label: '9 класс' },
-  { value: '10', label: '10 класс' },
-  { value: '11', label: '11 класс' },
-  { value: '12', label: '12 класс' },
-]
+const roleKeys = ['', 'PARENT', 'STUDENT', 'SCHOOL', 'CAREER_COUNSELOR', 'OTHER'] as const
+
+const gradeKeys = ['', '8', '9', '10', '11', '12'] as const
 
 function formatPhoneNumber(value: string): string {
   const digits = value.replace(/\D/g, '')
@@ -88,6 +83,11 @@ function formatPhoneNumber(value: string): string {
 }
 
 export function ApplicationForm({ tourId, tourTitle, type = 'TOUR', compact = false, onSuccess }: ApplicationFormProps) {
+  const t = useTranslations('form')
+  const tr = useTranslations('roles')
+  const tcities = useTranslations('cities')
+  const tg = useTranslations('grades')
+
   const [loading, setLoading] = useState(false)
   const [success, setSuccess] = useState(false)
   const [error, setError] = useState('')
@@ -103,6 +103,21 @@ export function ApplicationForm({ tourId, tourTitle, type = 'TOUR', compact = fa
     message: '',
   })
 
+  const roleOptions = roleKeys.map((key) => ({
+    value: key,
+    label: key === '' ? t('selectRole') : tr(key),
+  }))
+
+  const cityOptions = cityKeys.map((key) => ({
+    value: cityValues[key],
+    label: key === '' ? t('selectCity') : key === 'other' ? t('otherCity') : tcities(key),
+  }))
+
+  const gradeOptions = gradeKeys.map((key) => ({
+    value: key,
+    label: key === '' ? t('selectGrade') : tg(key),
+  }))
+
   const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const formatted = formatPhoneNumber(e.target.value)
     if (formatted.length <= 18) {
@@ -116,7 +131,6 @@ export function ApplicationForm({ tourId, tourTitle, type = 'TOUR', compact = fa
     setError('')
 
     try {
-      // Определяем город для отправки
       const cityValue = formData.city === 'other' ? formData.otherCity : formData.city
 
       const submitData = {
@@ -147,7 +161,7 @@ export function ApplicationForm({ tourId, tourTitle, type = 'TOUR', compact = fa
       setFormData({ name: '', phone: '+7', city: '', otherCity: '', grade: '', role: '', otherRole: '', message: '' })
       onSuccess?.()
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Произошла ошибка')
+      setError(err instanceof Error ? err.message : t('errorOccurred'))
     } finally {
       setLoading(false)
     }
@@ -155,8 +169,8 @@ export function ApplicationForm({ tourId, tourTitle, type = 'TOUR', compact = fa
 
   if (success) {
     return (
-      <div className="rounded-lg bg-green-50 p-4 text-center">
-        <div className="mx-auto mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-green-100">
+      <div className="rounded-lg bg-green-50 p-4 text-center dark:bg-green-900/30">
+        <div className="mx-auto mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-green-100 dark:bg-green-800/50">
           <svg
             className="h-5 w-5 text-green-600"
             fill="none"
@@ -171,9 +185,9 @@ export function ApplicationForm({ tourId, tourTitle, type = 'TOUR', compact = fa
             />
           </svg>
         </div>
-        <h3 className="text-base font-semibold text-green-800">Заявка отправлена!</h3>
-        <p className="mt-1 text-sm text-green-700">
-          Мы свяжемся с вами в течение 24 часов и отправим программу тура.
+        <h3 className="text-base font-semibold text-green-800 dark:text-green-300">{t('requestSent')}</h3>
+        <p className="mt-1 text-sm text-green-700 dark:text-green-400">
+          {t('requestSentMessage')}
         </p>
         <Button
           variant="outline"
@@ -181,7 +195,7 @@ export function ApplicationForm({ tourId, tourTitle, type = 'TOUR', compact = fa
           className="mt-3"
           onClick={() => setSuccess(false)}
         >
-          Отправить ещё
+          {t('sendAnother')}
         </Button>
       </div>
     )
@@ -194,54 +208,54 @@ export function ApplicationForm({ tourId, tourTitle, type = 'TOUR', compact = fa
   return (
     <form onSubmit={handleSubmit} className={compact ? 'space-y-3' : 'space-y-4'}>
       {tourTitle && (
-        <div className="rounded-lg bg-blue-50 p-3">
-          <p className="text-sm text-blue-800">
-            Заявка на тур: <strong>{tourTitle}</strong>
+        <div className="rounded-lg bg-blue-50 p-3 dark:bg-blue-900/30">
+          <p className="text-sm text-blue-800 dark:text-blue-300">
+            {t('applicationForTour')} <strong>{tourTitle}</strong>
           </p>
         </div>
       )}
 
       <Input
-        label="Имя"
+        label={t('name')}
         id="name"
         value={formData.name}
         onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-        placeholder="Ваше имя"
+        placeholder={t('namePlaceholder')}
         required
       />
 
       <Input
-        label="Телефон"
+        label={t('phone')}
         id="phone"
         type="tel"
         value={formData.phone}
         onChange={handlePhoneChange}
-        placeholder="+7 (___) ___-__-__"
+        placeholder={t('phonePlaceholder')}
         required
       />
 
       <Select
-        label="Город"
+        label={t('city')}
         id="city"
         value={formData.city}
         onChange={(e) => setFormData({ ...formData, city: e.target.value, otherCity: '' })}
-        options={kazakhstanCities}
+        options={cityOptions}
         required
       />
 
       {showOtherCityInput && (
         <Input
-          label="Укажите Ваш город"
+          label={t('specifyCity')}
           id="otherCity"
           value={formData.otherCity}
           onChange={(e) => setFormData({ ...formData, otherCity: e.target.value })}
-          placeholder="Название города"
+          placeholder={t('cityNamePlaceholder')}
           required
         />
       )}
 
       <Select
-        label="Класс"
+        label={t('grade')}
         id="grade"
         value={formData.grade}
         onChange={(e) => setFormData({ ...formData, grade: e.target.value })}
@@ -250,7 +264,7 @@ export function ApplicationForm({ tourId, tourTitle, type = 'TOUR', compact = fa
       />
 
       <Select
-        label="Кто Вы?"
+        label={t('role')}
         id="role"
         value={formData.role}
         onChange={(e) => setFormData({ ...formData, role: e.target.value, otherRole: '' })}
@@ -260,37 +274,37 @@ export function ApplicationForm({ tourId, tourTitle, type = 'TOUR', compact = fa
 
       {showOtherRoleInput && (
         <Input
-          label="Укажите кто Вы"
+          label={t('specifyRole')}
           id="otherRole"
           value={formData.otherRole}
           onChange={(e) => setFormData({ ...formData, otherRole: e.target.value })}
-          placeholder="Напишите..."
+          placeholder={t('writePlaceholder')}
         />
       )}
 
       {showMessage && (
         <Textarea
-          label="Сообщение"
+          label={t('message')}
           id="message"
           value={formData.message}
           onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-          placeholder="Укажите школу, класс и количество учеников..."
+          placeholder={t('messagePlaceholder')}
           rows={3}
         />
       )}
 
       {error && (
-        <div className="rounded-lg bg-red-50 p-3">
-          <p className="text-sm text-red-800">{error}</p>
+        <div className="rounded-lg bg-red-50 p-3 dark:bg-red-900/30">
+          <p className="text-sm text-red-800 dark:text-red-300">{error}</p>
         </div>
       )}
 
       <Button type="submit" className="w-full" loading={loading}>
-        {type === 'TOUR' ? 'Записаться на тур' : 'Отправить заявку'}
+        {type === 'TOUR' ? t('signUpForTour') : t('sendRequest')}
       </Button>
 
-      <p className="text-center text-xs text-gray-500">
-        Мы свяжемся с вами в течение 24 часов и отправим программу тура
+      <p className="text-center text-xs text-gray-500 dark:text-gray-400">
+        {t('contactNote')}
       </p>
     </form>
   )
